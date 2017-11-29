@@ -40,9 +40,6 @@
     // Show statistics such as fps and timing information
     self.sceneView.showsStatistics = YES;
     
-    // Create a new scene
-    SCNScene *scene = [SCNScene sceneNamed:@"art.scnassets/ship.scn"];
-    
     // Set the scene to the view
     self.sceneView.scene = [[SCNScene alloc] init];
     
