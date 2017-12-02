@@ -53,17 +53,48 @@
 
 
 - (void)processImage:(UIImage *)image {
-    
+//    VNCoreMLModel *model = [VNCoreMLModel modelForMLModel:<#(nonnull MLModel *)#> error:<#(NSError * _Nullable __autoreleasing * _Nullable)#>]
     VNImageRequestHandler *handler = [[VNImageRequestHandler alloc] initWithCGImage:image.CGImage options:@{}];
+
     
     VNDetectFaceRectanglesRequest *request = [[VNDetectFaceRectanglesRequest alloc]initWithCompletionHandler:^(VNRequest * _Nonnull request, NSError * _Nullable error) {
         
         self.restultLabel.text = [NSString stringWithFormat:@"找到了%zd张脸",request.results.count];
-        
+        for (VNFaceObservation *observasion in request.results) {
+            [self addFaceContour:observasion view:self.button];
+        }
         
     }];
     
     [handler performRequests:@[request] error:nil];
+}
+
+
+- (void)addFaceContour:(VNFaceObservation *)observasion view:(UIView *)view {
+    
+    [view.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
+
+    
+    CGRect faceBox = observasion.boundingBox;
+    CGRect viewBox = view.frame;
+    
+    CGFloat width = faceBox.size.width * viewBox.size.width;
+    CGFloat height = faceBox.size.height * viewBox.size.height;
+    CGFloat x = faceBox.origin.x *viewBox.size.width;
+    CGFloat y = fabs((faceBox.origin.y *viewBox.size.height) - viewBox.size.height) - height;
+    UIView *subView = [[UIView alloc] initWithFrame:CGRectMake(x, y, width, height)];
+    subView.layer.masksToBounds = YES;
+    subView.layer.borderColor = [UIColor yellowColor].CGColor;
+    subView.layer.borderWidth = 3;
+    subView.layer.cornerRadius = 5;
+    subView.tag = 100;
+    [view addSubview:subView];
+    
+    
+    
+    
+    
+    
 }
 
 
