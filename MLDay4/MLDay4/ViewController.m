@@ -8,7 +8,7 @@
 
 #import "ViewController.h"
 #import <Vision/Vision.h>
-
+#import <CoreML/CoreML.h>
 @interface ViewController ()<UIImagePickerControllerDelegate,UINavigationControllerDelegate>
 
 @property (weak, nonatomic) IBOutlet UIButton *button;
@@ -55,7 +55,8 @@
 - (void)processImage:(UIImage *)image {
 //    VNCoreMLModel *model = [VNCoreMLModel modelForMLModel:<#(nonnull MLModel *)#> error:<#(NSError * _Nullable __autoreleasing * _Nullable)#>]
     VNImageRequestHandler *handler = [[VNImageRequestHandler alloc] initWithCGImage:image.CGImage options:@{}];
-
+    VNSequenceRequestHandler *handlers = [[VNSequenceRequestHandler alloc]init];
+    
     
     VNDetectFaceLandmarksRequest *request = [[VNDetectFaceLandmarksRequest alloc]initWithCompletionHandler:^(VNRequest * _Nonnull request, NSError * _Nullable error) {
         
@@ -72,7 +73,8 @@
     
     }];
     
-    [handler performRequests:@[request] error:nil];
+    [handlers performRequests:@[request] onCGImage:image.CGImage error:nil];
+//    [handler performRequests:@[request] error:nil];
 }
 
 
