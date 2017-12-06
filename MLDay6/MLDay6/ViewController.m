@@ -10,6 +10,7 @@
 #import <Vision/Vision.h>
 #import <CoreML/CoreML.h>
 #import <AVFoundation/AVFoundation.h>
+
 @interface ViewController ()<AVCaptureVideoDataOutputSampleBufferDelegate>
 
 /**
@@ -27,7 +28,10 @@
  */
 @property (nonatomic, strong)AVCaptureVideoPreviewLayer * videoLayer;
 
-
+/**
+ <#Description#>
+ */
+@property (nonatomic, strong)dispatch_queue_t  queue;
 /**
  <#Description#>
  */
@@ -52,13 +56,34 @@
 #pragma mark --------- AVCaptureFileOutputRecordingDelegate
 
 - (void)captureOutput:(AVCaptureOutput *)output didDropSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection {
-    NSLog(@"结束输出");
+    CVPixelBufferRef buffer = CMSampleBufferGetImageBuffer(sampleBuffer);
+    
+    VNImageRequestHandler *handler = [[VNImageRequestHandler alloc]initWithCVPixelBuffer:buffer options:@{}];
+    
+    VNDetectRectanglesRequest *request = [[VNDetectRectanglesRequest alloc]initWithCompletionHandler:^(VNRequest * _Nonnull request, NSError * _Nullable error) {
+        NSLog(@"0-------%@",request.results);
+    }];
+    [handler performRequests:@[request] error:nil];
 }
 
 - (void)captureOutput:(AVCaptureOutput *)output didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection {
-    NSLog(@"开始输出");
+    NSLog(@"输出缓冲区");
+    
+    
+    
 }
 
+
+- (void)detectObjectWithPixelBuffer:(CVPixelBufferRef)buffer {
+    
+    
+}
+
+
+- (CVPixelBufferRef) rotateBufferWithSampleBuffer:(CMSampleBufferRef)buffer {
+    
+    return nil;
+}
 
 
 - (void)setCapure {
@@ -95,7 +120,7 @@
 - (void)videoSetting {
     
     
-    [self.capOutput setSampleBufferDelegate:self queue:nil];
+    [self.capOutput setSampleBufferDelegate:self queue:self.queue];
     
 }
 
@@ -140,6 +165,13 @@
         _videoLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
     }
     return _videoLayer;
+}
+
+-(dispatch_queue_t)queue {
+    if (!_queue) {
+        _queue = dispatch_queue_create("azhen_queue", NULL);
+    }
+    return _queue;
 }
 
 @end
