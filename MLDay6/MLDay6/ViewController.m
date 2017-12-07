@@ -56,22 +56,55 @@
 #pragma mark --------- AVCaptureFileOutputRecordingDelegate
 
 - (void)captureOutput:(AVCaptureOutput *)output didDropSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection {
-    CVPixelBufferRef buffer = CMSampleBufferGetImageBuffer(sampleBuffer);
-    
-    VNImageRequestHandler *handler = [[VNImageRequestHandler alloc]initWithCVPixelBuffer:buffer options:@{}];
-    
-    VNDetectRectanglesRequest *request = [[VNDetectRectanglesRequest alloc]initWithCompletionHandler:^(VNRequest * _Nonnull request, NSError * _Nullable error) {
-        NSLog(@"0-------%@",request.results);
-    }];
-    [handler performRequests:@[request] error:nil];
+
+
 }
 
 - (void)captureOutput:(AVCaptureOutput *)output didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection {
-    NSLog(@"输出缓冲区");
+    
+    
+    VNImageRequestHandler *handler = [[VNImageRequestHandler alloc]initWithCGImage:[self imageFromSampleBuffer:sampleBuffer] options:@{}];
+    
+    VNDetectRectanglesRequest *request = [[VNDetectRectanglesRequest alloc]initWithCompletionHandler:^(VNRequest * _Nonnull request, NSError * _Nullable error) {
+        
+    }];
+    
+    [handler performRequests:@[request] error:nil];
     
     
     
 }
+
+- (CGImageRef) imageFromSampleBuffer:(CMSampleBufferRef) sampleBuffer
+
+{
+    CVImageBufferRef buffer;
+    buffer = CMSampleBufferGetImageBuffer(sampleBuffer);
+    
+    CVPixelBufferLockBaseAddress(buffer, 0);
+    uint8_t *base;
+    size_t width, height, bytesPerRow;
+    base = (uint8_t *)CVPixelBufferGetBaseAddress(buffer);
+    width = CVPixelBufferGetWidth(buffer);
+    height = CVPixelBufferGetHeight(buffer);
+    bytesPerRow = CVPixelBufferGetBytesPerRow(buffer);
+    
+    CGColorSpaceRef colorSpace;
+    CGContextRef cgContext;
+    colorSpace = CGColorSpaceCreateDeviceRGB();
+    cgContext = CGBitmapContextCreate(base, width, height, 8, bytesPerRow, colorSpace, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
+    CGColorSpaceRelease(colorSpace);
+    
+    CGImageRef cgImage;
+    cgImage = CGBitmapContextCreateImage(cgContext);
+    CGImageRelease(cgImage);
+    CGContextRelease(cgContext);
+    CVPixelBufferUnlockBaseAddress(buffer, 0);
+    return cgImage;
+    
+}
+
+
 
 
 - (void)detectObjectWithPixelBuffer:(CVPixelBufferRef)buffer {
@@ -138,7 +171,7 @@
 -(AVCaptureSession *)capSession {
     if (!_capSession) {
         _capSession = [[AVCaptureSession alloc]init];
-        _capSession.sessionPreset = AVCaptureSessionPresetMedium;
+        _capSession.sessionPreset = AVCaptureSessionPreset1920x1080;
     }
     return _capSession;
 }
