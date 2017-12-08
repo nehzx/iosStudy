@@ -126,11 +126,6 @@
     AVCaptureDeviceInput *videoInput = [AVCaptureDeviceInput deviceInputWithDevice:video error:nil];
     if (![self.capSession canAddInput:videoInput]) return;
     [self.capSession addInput:videoInput];
-    
-    AVCaptureDevice *audion = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeAudio];
-    AVCaptureDeviceInput *audioInput = [AVCaptureDeviceInput deviceInputWithDevice:audion error:nil];
-    if (![self.capSession canAddInput:audioInput]) return;
-    [self.capSession addInput:audioInput];
     if (![self.capSession canAddOutput:self.capOutput])return;
     [self.capSession addOutput:self.capOutput];
     
