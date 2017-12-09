@@ -132,6 +132,8 @@
     self.videoLayer.frame = self.view.frame;
     [self.videoView.layer addSublayer:self.videoLayer];
     
+    
+    
     if (![self.capSession isRunning]) {
         [self.capSession startRunning];
     }
