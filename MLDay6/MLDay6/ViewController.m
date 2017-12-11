@@ -115,6 +115,8 @@
 
 - (CVPixelBufferRef) rotateBufferWithSampleBuffer:(CMSampleBufferRef)buffer {
     
+    
+    //处理缓冲区
     return nil;
 }
 
