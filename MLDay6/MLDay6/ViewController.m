@@ -50,6 +50,7 @@
     
     [self.view addSubview:self.videoView];
     [self setCapure];
+    //暂时休息
 }
 
 
